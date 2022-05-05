@@ -1,0 +1,7 @@
+/package-lock.json
+/node_modules/
+./.idea
+.idea/vcs.xml
+.idea/React-side-effects-practice.iml
+.idea/modules.xml
+.idea/inspectionProfiles/Project_Default.xml
