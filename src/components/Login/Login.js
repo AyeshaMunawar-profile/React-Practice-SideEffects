@@ -12,9 +12,16 @@ const Login = (props) => {
     const [formIsValid, setFormIsValid] = useState(false);
 
     useEffect(() => {
-        setFormIsValid(
-            enteredEmail.includes('@') && enteredPassword.trim().length > 6
-        );
+        const formValidationTimer = setTimeout(() => {
+            console.log("Checking for validity ...");
+            setFormIsValid(
+                enteredEmail.includes('@') && enteredPassword.trim().length > 6
+            );
+        }, 500)
+        return (()=>{
+            clearTimeout(formValidationTimer)
+            console.log("cleanup")
+        })
     }, [enteredEmail, enteredPassword])
 
     const emailChangeHandler = (event) => {
@@ -40,7 +47,7 @@ const Login = (props) => {
 
     return (
         <Card className={classes.login}>
-            <form onSubmit={submitHandler}>
+            <form onSubmit={submitHandler} autoComplete="off">
                 <div
                     className={`${classes.control} ${
                         emailIsValid === false ? classes.invalid : ''
@@ -48,6 +55,7 @@ const Login = (props) => {
                 >
                     <label htmlFor="email">E-Mail</label>
                     <input
+                        role="presentation"
                         type="email"
                         id="email"
                         value={enteredEmail}
