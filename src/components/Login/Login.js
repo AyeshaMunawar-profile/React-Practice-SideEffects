@@ -1,41 +1,78 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useState, useReducer} from 'react';
 
 import Card from '../UI/Card/Card';
 import classes from './Login.module.css';
 import Button from '../UI/Button/Button';
 
+const initialEmailState = {
+    value: "",
+    isValid: undefined
+}
+const initialPasswordState = {
+    value: "",
+    isValid: undefined
+}
+const emailReducer = (previousState, action) => {
+    if (action.type === "USER_INPUT") {
+        return {value: action.value, isValid: action.value.includes('@')}
+    }
+    // react guarantees that the first argument in reducer function has the absolute latest value fo the state
+    if (action.type === "INPUT_BLUR") {
+        return {value: previousState.value, isValid: previousState.value.includes('@')}
+    }
+    return {value: "", isValid: false}
+}
+const passwordReducer = (previousState, action) => {
+    if (action.type === "USER_INPUT") {
+        return {value: action.value, isValid: action.value.trim().length > 6}
+    }
+    if (action.type === "INPUT_BLUR") {
+        return {value: previousState.value, isValid: previousState.value.trim().length > 6}
+    }
+    return {value: "", isValid: false}
+}
 const Login = (props) => {
-    const [enteredEmail, setEnteredEmail] = useState('');
-    const [emailIsValid, setEmailIsValid] = useState();
-    const [enteredPassword, setEnteredPassword] = useState('');
-    const [passwordIsValid, setPasswordIsValid] = useState();
     const [formIsValid, setFormIsValid] = useState(false);
-
+    const [emailState, dispatchEmail] = useReducer(emailReducer, initialEmailState);
+    const [passwordState, dispatchPassword] = useReducer(passwordReducer, initialPasswordState)
+    const {isValid: isEmailValid} = emailState
+    const {isValid: isPasswordValid} = passwordState
+    // don't check for form validity after each keystroke so set a timer
+    // after each keystroke remove that timer immediately if there is another keystroke
+    // only after last keystroke don't delete the timer instead finish it after 500ms run the validity check
+    // thus saving app from unnecessary renders and lag
     useEffect(() => {
-        setFormIsValid(
-            enteredEmail.includes('@') && enteredPassword.trim().length > 6
-        );
-    }, [enteredEmail, enteredPassword])
+        const formValidationTimer = setTimeout(() => {
+            console.log("Checking for validity ...");
+            setFormIsValid(
+                isEmailValid && isPasswordValid
+            );
+        }, 500)
+        return (() => {
+            clearTimeout(formValidationTimer)
+            console.log("cleanup")
+        })
+    }, [isEmailValid, isPasswordValid])
 
     const emailChangeHandler = (event) => {
-        setEnteredEmail(event.target.value);
+        dispatchEmail({type: "USER_INPUT", value: event.target.value})
     };
 
     const passwordChangeHandler = (event) => {
-        setEnteredPassword(event.target.value);
+        dispatchPassword({type: "USER_INPUT", value: event.target.value});
     };
 
     const validateEmailHandler = () => {
-        setEmailIsValid(enteredEmail.includes('@'));
+        dispatchEmail({type: "INPUT_BLUR"})
     };
 
     const validatePasswordHandler = () => {
-        setPasswordIsValid(enteredPassword.trim().length > 6);
+        dispatchPassword({type: "INPUT_BLUR"})
     };
 
     const submitHandler = (event) => {
         event.preventDefault();
-        props.onLogin(enteredEmail, enteredPassword);
+        props.onLogin(emailState.value, passwordState.value);
     };
 
     return (
@@ -43,28 +80,28 @@ const Login = (props) => {
             <form onSubmit={submitHandler}>
                 <div
                     className={`${classes.control} ${
-                        emailIsValid === false ? classes.invalid : ''
+                        emailState.isValid === false ? classes.invalid : ''
                     }`}
                 >
                     <label htmlFor="email">E-Mail</label>
                     <input
                         type="email"
                         id="email"
-                        value={enteredEmail}
+                        value={emailState.value}
                         onChange={emailChangeHandler}
                         onBlur={validateEmailHandler}
                     />
                 </div>
                 <div
                     className={`${classes.control} ${
-                        passwordIsValid === false ? classes.invalid : ''
+                        passwordState.isValid === false ? classes.invalid : ''
                     }`}
                 >
                     <label htmlFor="password">Password</label>
                     <input
                         type="password"
                         id="password"
-                        value={enteredPassword}
+                        value={passwordState.value}
                         onChange={passwordChangeHandler}
                         onBlur={validatePasswordHandler}
                     />
