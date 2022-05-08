@@ -1,0 +1,70 @@
+Index: src/components/MainHeader/Navigation.js
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>import React from 'react';\r\n\r\nimport classes from './Navigation.module.css';\r\nimport AuthContext from \"../../store/auth-context\";\r\n\r\nconst Navigation = (props) => {\r\n    return (\r\n        // for the consumer component\r\n        // use an arrow function to access the vales of context\r\n        <AuthContext.Consumer>\r\n            {(ctx) => {\r\n                return (\r\n                    <nav className={classes.nav}>\r\n                        <ul>\r\n                            {ctx.isLoggedIn && (\r\n                                <li>\r\n                                    <a href=\"/\">Users</a>\r\n                                </li>\r\n                            )}\r\n                            {ctx.isLoggedIn && (\r\n                                <li>\r\n                                    <a href=\"/\">Admin</a>\r\n                                </li>\r\n                            )}\r\n                            {ctx.isLoggedIn && (\r\n                                <li>\r\n                                    <button onClick={props.onLogout}>Logout</button>\r\n                                </li>\r\n                            )}\r\n                        </ul>\r\n                    </nav>\r\n                )\r\n            }}\r\n\r\n        </AuthContext.Consumer>\r\n    );\r\n};\r\n\r\nexport default Navigation;\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/components/MainHeader/Navigation.js b/src/components/MainHeader/Navigation.js
+--- a/src/components/MainHeader/Navigation.js	(revision 3141a936644a64c7b5328de80f0b52da4372c2ef)
++++ b/src/components/MainHeader/Navigation.js	(date 1651989697808)
+@@ -1,38 +1,31 @@
+-import React from 'react';
+-
++import React, {useContext} from 'react';
+ import classes from './Navigation.module.css';
+ import AuthContext from "../../store/auth-context";
+ 
+ const Navigation = (props) => {
++    const ctx = useContext(AuthContext)
+     return (
+         // for the consumer component
+         // use an arrow function to access the vales of context
+-        <AuthContext.Consumer>
+-            {(ctx) => {
+-                return (
+-                    <nav className={classes.nav}>
+-                        <ul>
+-                            {ctx.isLoggedIn && (
+-                                <li>
+-                                    <a href="/">Users</a>
+-                                </li>
+-                            )}
+-                            {ctx.isLoggedIn && (
+-                                <li>
+-                                    <a href="/">Admin</a>
+-                                </li>
+-                            )}
+-                            {ctx.isLoggedIn && (
+-                                <li>
+-                                    <button onClick={props.onLogout}>Logout</button>
+-                                </li>
+-                            )}
+-                        </ul>
+-                    </nav>
+-                )
+-            }}
+-
+-        </AuthContext.Consumer>
++        <nav className={classes.nav}>
++            <ul>
++                {ctx.isLoggedIn && (
++                    <li>
++                        <a href="/">Users</a>
++                    </li>
++                )}
++                {ctx.isLoggedIn && (
++                    <li>
++                        <a href="/">Admin</a>
++                    </li>
++                )}
++                {ctx.isLoggedIn && (
++                    <li>
++                        <button onClick={props.onLogout}>Logout</button>
++                    </li>
++                )}
++            </ul>
++        </nav>
+     );
+ };
+ 
